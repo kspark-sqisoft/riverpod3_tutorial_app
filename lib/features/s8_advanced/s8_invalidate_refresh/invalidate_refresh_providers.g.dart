@@ -54,4 +54,4 @@ final class RebuildCounterProvider extends $FunctionalProvider<int, int, int>
   }
 }
 
-String _$rebuildCounterHash() => r'1d862d1377356cdf2ea655d3b65bac86546c8bdb';
+String _$rebuildCounterHash() => r'd7d4d1e1a3ab9d0a9ac9c33b18ecdae8c5a3771d';

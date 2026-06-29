@@ -11,20 +11,48 @@ String _stamp() {
   return '${two(t.hour)}:${two(t.minute)}:${two(t.second)}';
 }
 
+/// 상태 = (카운터, 생성 시각).
+///  - count     : '+1' 버튼으로 올라가는 값 (재생성되면 0 으로 리셋)
+///  - createdAt  : build 된 시각 (재생성되면 갱신)
+typedef CounterState = (int count, String createdAt);
+
 /// autoDispose(기본): 구독자가 모두 사라지면 폐기된다.
-/// 다시 구독하면 build 가 재실행되어 새 값(새 시각)이 만들어진다.
+/// 다시 구독하면 build 가 재실행되어 카운터는 0, 생성 시각도 갱신된다.
 @riverpod
-String autoDisposeStamp(Ref ref) {
-  log.t('🟢 [autoDisposeStampProvider] build');
-  ref.onDispose(() => log.i('⚪ [autoDisposeStampProvider] dispose'));
-  return _stamp();
+class AutoDisposeCounter extends _$AutoDisposeCounter {
+  @override
+  CounterState build() {
+    final at = _stamp();
+    log.t('🟢 [autoDisposeCounterProvider] build (생성 @$at · count=0)');
+    ref.onDispose(() =>
+        log.i('⚪ [autoDisposeCounterProvider] dispose — autoDispose (카운터 사라짐)'));
+    return (0, at);
+  }
+
+  // 상태만 +1 — 같은 인스턴스 유지(폐기 전까지).
+  void increment() {
+    final (count, at) = state;
+    state = (count + 1, at);
+    log.t('🔄 [autoDisposeCounterProvider] count=${count + 1}');
+  }
 }
 
-/// keepAlive: true → 구독자가 없어도 폐기되지 않고 상태가 유지된다.
-/// 다시 구독해도 처음 만든 값(시각)이 그대로 유지된다.
+/// keepAlive: true → 구독자가 0 이 되어도 폐기되지 않고 상태가 유지된다.
+/// 다시 구독해도 카운터와 생성 시각이 그대로 유지된다.
 @Riverpod(keepAlive: true)
-String keepAliveStamp(Ref ref) {
-  log.t('🟢 [keepAliveStampProvider] build');
-  ref.onDispose(() => log.i('⚪ [keepAliveStampProvider] dispose'));
-  return _stamp();
+class KeepAliveCounter extends _$KeepAliveCounter {
+  @override
+  CounterState build() {
+    final at = _stamp();
+    log.t('🟢 [keepAliveCounterProvider] build (생성 @$at · count=0)');
+    ref.onDispose(
+        () => log.i('⚪ [keepAliveCounterProvider] dispose (거의 안 됨)'));
+    return (0, at);
+  }
+
+  void increment() {
+    final (count, at) = state;
+    state = (count + 1, at);
+    log.t('🔄 [keepAliveCounterProvider] count=${count + 1}');
+  }
 }

@@ -44,7 +44,7 @@ final class VolatileCounterProvider
   }
 }
 
-String _$volatileCounterHash() => r'2c5fbe85eae425c21f916159bccdb4fd1489001a';
+String _$volatileCounterHash() => r'000caa4649fe493078dd77f960b073b55f222776';
 
 /// autoDispose(기본) 카운터: 구독하던 화면을 떠나면 폐기되고, 다시 오면 0부터 재생성.
 
@@ -102,7 +102,7 @@ final class PersistentCounterProvider
   }
 }
 
-String _$persistentCounterHash() => r'edf940e14cfe41612687c6dff80bed6ca05b2a28';
+String _$persistentCounterHash() => r'444e11be57488e7c5200f045065516c246a1c9f7';
 
 /// keepAlive 카운터: 구독자가 없어도 유지 → 페이지를 옮겨도 값이 그대로.
 

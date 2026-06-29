@@ -71,7 +71,7 @@ final class CacheForDemoProvider
   }
 }
 
-String _$cacheForDemoHash() => r'a271529c2b09f95eff6094aed21765b167b59eeb';
+String _$cacheForDemoHash() => r'd9ee84770f1f312a8b6aa7b579e28dfb82701c0b';
 
 /// 캐시 적용 게시글 상세(family). 위 cacheFor 패턴을 dummyjson /posts/{id} 에 적용.
 ///
@@ -139,7 +139,7 @@ final class CachedPostProvider
   }
 }
 
-String _$cachedPostHash() => r'8193b47bfdb375eece0b087acc5db6868b76ab47';
+String _$cachedPostHash() => r'57267e430470e5fea3eb44e6b10d9c5f60408a09';
 
 /// 캐시 적용 게시글 상세(family). 위 cacheFor 패턴을 dummyjson /posts/{id} 에 적용.
 ///

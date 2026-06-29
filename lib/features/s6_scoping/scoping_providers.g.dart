@@ -24,8 +24,8 @@ final currentItemProvider = CurrentItemProvider._();
 /// (코드생성에서 스코프 의존성을 명시하려면 @Riverpod(dependencies: [...]) 를 사용한다.)
 
 final class CurrentItemProvider
-    extends $FunctionalProvider<String, String, String>
-    with $Provider<String> {
+    extends $FunctionalProvider<ScopedItem, ScopedItem, ScopedItem>
+    with $Provider<ScopedItem> {
   /// 스코프 전용 provider.
   ///
   /// 기본 구현은 예외를 던지고, 실제 값은 ProviderScope(overrides:) 로 "서브트리마다" 주입한다.
@@ -47,21 +47,21 @@ final class CurrentItemProvider
 
   @$internal
   @override
-  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<ScopedItem> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  String create(Ref ref) {
+  ScopedItem create(Ref ref) {
     return currentItem(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(String value) {
+  Override overrideWithValue(ScopedItem value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<String>(value),
+      providerOverride: $SyncValueProvider<ScopedItem>(value),
     );
   }
 }
 
-String _$currentItemHash() => r'0dc5ccfbeb26a2a1a2a596fc1c989d4403c1b47d';
+String _$currentItemHash() => r'b6ab7b15e0b5129553ab0a2affa069046bae8b5d';
