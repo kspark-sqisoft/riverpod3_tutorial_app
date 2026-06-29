@@ -13,9 +13,18 @@ import '../shared/app_logger.dart';
 final class LifecycleObserver extends ProviderObserver {
   const LifecycleObserver();
 
-  // provider 의 표시용 이름. 코드생성 provider 는 'weatherProvider' 같은 name 을 가진다.
-  String _name(ProviderObserverContext context) =>
-      context.provider.name ?? context.provider.runtimeType.toString();
+  // provider 의 표시용 이름.
+  //
+  // 코드생성 provider 의 정규 이름은 'weatherProvider' 처럼 'Provider' 로 끝난다.
+  // 화면 로그는 이 정규 이름으로 통일한다 — provider 가 build 안에서 직접 남기는
+  // 손글씨 로그도 같은 'xxxProvider' 태그를 쓰므로, observer 와 손글씨가 한 이름으로 보인다.
+  // family 인스턴스면 인자를 붙여 어떤 인스턴스인지 구분한다: 'weatherProvider(서울)'.
+  String _name(ProviderObserverContext context) {
+    final provider = context.provider;
+    final name = provider.name ?? provider.runtimeType.toString();
+    final argument = provider.argument;
+    return argument == null ? name : '$name($argument)';
+  }
 
   @override
   void didAddProvider(ProviderObserverContext context, Object? value) {

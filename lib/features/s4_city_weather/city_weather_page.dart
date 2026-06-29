@@ -9,6 +9,11 @@ import 'city_weather_providers.dart';
 
 const List<String> _cities = ['서울', '부산', '제주', '도쿄', '뉴욕'];
 
+/// 두 경로 공통의 트리거/의존(도시·단위) 로그인지 판정 — ①/② 필터를 켜도 함께 보이게 한다.
+bool _isSharedInput(LogEntry e) =>
+    e.message.contains('[selectedCityProvider]') ||
+    e.message.contains('[unitProvider]');
+
 /// 토픽 12: 프로바이더 간 의존 + 라이프사이클 (도시 → 날씨).
 class CityWeatherPage extends ConsumerWidget {
   const CityWeatherPage({super.key});
@@ -33,13 +38,15 @@ class CityWeatherPage extends ConsumerWidget {
           '② weather 는 unitProvider 를 ref.watch 하므로, 단위를 바꾸면 같은 weather 인스턴스가 '
           '무효화되어 build() 가 처음부터 다시 실행됩니다(인스턴스는 그대로, 값만 재계산). '
           '둘 다 결과는 "이전 상태 폐기 + 새 build" 지만 메커니즘이 다릅니다. '
-          '아래 ① family 인자 카드와 ② 인자 없이 watch 하는 카드를 나란히 두었으니, 로그로 두 방식의 차이를 직접 비교해 보세요.',
+          '아래 ① family 인자 카드와 ② 인자 없이 watch 하는 카드를 나란히 두었으니, 로그로 두 방식의 차이를 직접 비교해 보세요. '
+          '두 경로가 한 패널에 섞이므로, 로그 패널 상단의 "전체 / ① / ②" 칩으로 한쪽 경로만 골라 볼 수 있습니다.',
       points: const [
         'selectedCity(Notifier) → weather(city)(family) → UI 로 이어지는 의존 체인',
         'city 는 watch 가 아니라 family 인자 → 도시 변경 = 다른 인스턴스로 "교체"(이전 인스턴스는 구독을 잃어 autoDispose 폐기)',
         'unit 은 ref.watch 의존 → 단위 변경 = "같은" weather 인스턴스가 invalidate 되어 build 재실행',
         '정리: 둘 다 "폐기 + 새 build" 지만 ①은 인스턴스 교체, ②는 동일 인스턴스 재실행',
         'family 인스턴스마다 독립적인 라이프사이클',
+        '로그가 섞여 헷갈리면 패널 상단의 "전체 / ① / ②" 칩으로 한쪽만 골라 보세요',
       ],
       demo: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -110,7 +117,7 @@ class CityWeatherPage extends ConsumerWidget {
                   Text(
                     '위의 같은 도시 칩 / 단위 토글을 그대로 씁니다. 이 provider 는 city 를 '
                     '인자로 받지 않고 내부에서 watch 하므로 인스턴스가 "하나"뿐 — 도시를 바꿔도 '
-                    '교체가 아니라 같은 인스턴스가 재build 됩니다. 로그에서 [weatherWatched] 는 '
+                    '교체가 아니라 같은 인스턴스가 재build 됩니다. 로그에서 [weatherWatchedProvider] 는 '
                     '도시 전환 시 onAddListener/onRemoveListener 가 찍히지 않는 것을 확인하세요.',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
@@ -131,7 +138,28 @@ class CityWeatherPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          const LifecycleLogView(height: 240),
+          // 두 경로가 한 패널에 섞이므로, 출처 칩으로 한쪽만 골라 볼 수 있게 한다.
+          // 손글씨 로그·observer 모두 정규 이름(xxxProvider)으로 통일돼 형태가 같다:
+          //  - ① family 인자  : [weatherProvider(도시)]   (build/콜백 + observer 공통)
+          //  - ② 내부 watch   : [weatherWatchedProvider]  (build/콜백 + observer 공통)
+          // 두 경로 공통의 트리거/의존인 도시·단위([selectedCityProvider]/[unitProvider])는
+          // 각 필터에도 함께 보여, 필터를 켜도 "무엇이 바뀌어 반응했는지" 맥락이 남게 한다.
+          LifecycleLogView(
+            height: 240,
+            filters: [
+              LogFilter(
+                label: '① family 인자',
+                test: (e) =>
+                    e.message.contains('[weatherProvider(') || _isSharedInput(e),
+              ),
+              LogFilter(
+                label: '② 내부 watch',
+                test: (e) =>
+                    e.message.contains('[weatherWatchedProvider]') ||
+                    _isSharedInput(e),
+              ),
+            ],
+          ),
         ],
       ),
       snippets: const [
@@ -153,8 +181,8 @@ class SelectedCity extends _$SelectedCity {
 @riverpod
 Future<Weather> weather(Ref ref, String city) async {
   final unit = ref.watch(unitProvider);        // 의존: 단위 바뀌면 재실행
-  ref.onCancel(() => log('[$city] onCancel'));  // 도시 전환 시 이전 인스턴스
-  ref.onDispose(() => log('[$city] onDispose'));// 가 폐기되는 과정 관찰
+  ref.onCancel(() => log('[weatherProvider($city)] onCancel'));  // 도시 전환 시
+  ref.onDispose(() => log('[weatherProvider($city)] onDispose'));// 이전 인스턴스 폐기
   await Future.delayed(const Duration(milliseconds: 700));
   return fetchWeather(city, unit);
 }
@@ -172,7 +200,7 @@ Future<Weather> weatherWatched(Ref ref) async {
   final unit = ref.watch(unitProvider);
   // 도시가 바뀌면 같은 인스턴스가 invalidate → onDispose(이전 build 정리) → build 재실행.
   // 구독은 그대로라 onAddListener/onRemoveListener 는 도시 전환 때 찍히지 않는다.
-  ref.onDispose(() => log('[weatherWatched] onDispose (이전 build 정리)'));
+  ref.onDispose(() => log('[weatherWatchedProvider] onDispose (이전 build 정리)'));
   await Future.delayed(const Duration(milliseconds: 700));
   return fetchWeather(city, unit);
 }

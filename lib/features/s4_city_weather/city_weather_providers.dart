@@ -71,14 +71,14 @@ const Map<String, String> _condition = {
 @riverpod
 Future<Weather> weather(Ref ref, String city) async {
   final unit = ref.watch(unitProvider); // 의존: 단위 변경 시 재실행
-  log.t('🟢 [weather($city)] build 시작 (unit=$unit)');
+  log.t('🟢 [weatherProvider($city)] build 시작 (unit=$unit)');
 
   // 이 family 인스턴스의 라이프사이클 콜백 등록
-  ref.onAddListener(() => log.t('➕ [weather($city)] onAddListener'));
-  ref.onRemoveListener(() => log.t('➖ [weather($city)] onRemoveListener'));
-  ref.onCancel(() => log.w('⏸️ [weather($city)] onCancel (구독 0)'));
-  ref.onResume(() => log.d('▶️ [weather($city)] onResume'));
-  ref.onDispose(() => log.i('⚪ [weather($city)] onDispose (폐기)'));
+  ref.onAddListener(() => log.t('➕ [weatherProvider($city)] onAddListener'));
+  ref.onRemoveListener(() => log.t('➖ [weatherProvider($city)] onRemoveListener'));
+  ref.onCancel(() => log.w('⏸️ [weatherProvider($city)] onCancel (구독 0)'));
+  ref.onResume(() => log.d('▶️ [weatherProvider($city)] onResume'));
+  ref.onDispose(() => log.i('⚪ [weatherProvider($city)] onDispose (폐기)'));
 
   // 모의 비동기 호출(네트워크 흉내)
   await Future<void>.delayed(const Duration(milliseconds: 700));
@@ -91,7 +91,7 @@ Future<Weather> weather(Ref ref, String city) async {
     unit: unit,
     condition: _condition[city] ?? '맑음',
   );
-  log.i('🌡️ [weather($city)] 로드 완료: ${w.display}');
+  log.i('🌡️ [weatherProvider($city)] 로드 완료: ${w.display}');
   return w;
 }
 
@@ -107,14 +107,14 @@ Future<Weather> weather(Ref ref, String city) async {
 Future<Weather> weatherWatched(Ref ref) async {
   final city = ref.watch(selectedCityProvider); // 인자 대신 watch → 도시 바뀌면 재build
   final unit = ref.watch(unitProvider); // 단위도 watch → 바뀌면 재build
-  log.t('🟣 [weatherWatched] build 시작 (city=$city, unit=$unit)');
+  log.t('🟣 [weatherWatchedProvider] build 시작 (city=$city, unit=$unit)');
 
   // family 버전과 같은 콜백을 달아 두고 "무엇이 찍히는지"를 비교한다.
-  ref.onAddListener(() => log.t('➕ [weatherWatched] onAddListener'));
-  ref.onRemoveListener(() => log.t('➖ [weatherWatched] onRemoveListener'));
-  ref.onCancel(() => log.w('⏸️ [weatherWatched] onCancel (구독 0)'));
-  ref.onResume(() => log.d('▶️ [weatherWatched] onResume'));
-  ref.onDispose(() => log.i('⚪ [weatherWatched] onDispose (이전 build 정리 or 폐기)'));
+  ref.onAddListener(() => log.t('➕ [weatherWatchedProvider] onAddListener'));
+  ref.onRemoveListener(() => log.t('➖ [weatherWatchedProvider] onRemoveListener'));
+  ref.onCancel(() => log.w('⏸️ [weatherWatchedProvider] onCancel (구독 0)'));
+  ref.onResume(() => log.d('▶️ [weatherWatchedProvider] onResume'));
+  ref.onDispose(() => log.i('⚪ [weatherWatchedProvider] onDispose (이전 build 정리 or 폐기)'));
 
   await Future<void>.delayed(const Duration(milliseconds: 700));
   final baseC = _baseTempC[city] ?? 20;
@@ -126,6 +126,6 @@ Future<Weather> weatherWatched(Ref ref) async {
     unit: unit,
     condition: _condition[city] ?? '맑음',
   );
-  log.i('🌡️ [weatherWatched] 로드 완료: ${w.display}');
+  log.i('🌡️ [weatherWatchedProvider] 로드 완료: ${w.display}');
   return w;
 }
