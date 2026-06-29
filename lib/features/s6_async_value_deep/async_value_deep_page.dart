@@ -50,7 +50,9 @@ class _AsyncValueDeepPageState extends ConsumerState<AsyncValueDeepPage> {
           'loading() 을 건너뛰고 이전 data 를, skipLoadingOnReload(기본 false)는 의존 변경 때 기본은 loading() 을 '
           '부르지만 true 면 이전 data 를, skipError(기본 false)는 에러라도 이전 value 가 있으면 data() 로 그립니다. '
           '아래에서 세 옵션을 토글하고 "새로고침/의존 변경/실패" 를 눌러 when() 결과가 어떻게 달라지는지, 그리고 '
-          '플래그가 실시간 로그에서 어떻게 변하는지 직접 보세요.',
+          '플래그가 실시간 로그에서 어떻게 변하는지 직접 보세요. '
+          '이 옵션들이 왜 있냐면 — "같은 재요청이라도 상황에 따라 사용자에게 보여줄 게 다르기 때문"입니다. '
+          '아래 "실전 가이드" 카드에 각 옵션을 실제 어떤 화면에서 쓰는지 정리했습니다.',
       points: const [
         'isLoading: 새 값 로딩 중(최초·watch·refresh 모두). hasValue/hasError 와 동시 가능',
         'isReloading: 이전 값 보유 + 의존(ref.watch) 변경 재계산 (AsyncLoading 인스턴스)',
@@ -59,6 +61,9 @@ class _AsyncValueDeepPageState extends ConsumerState<AsyncValueDeepPage> {
         'when(skipLoadingOnRefresh: 기본 true): refresh 때 loading 건너뛰고 이전 data 유지',
         'when(skipLoadingOnReload: 기본 false): 의존 변경 때 기본은 loading → true 면 이전 data',
         'when(skipError: 기본 false): 에러라도 이전 value 있으면 data 로 표시',
+        '실전: 당겨서 새로고침/재시도 → skipLoadingOnRefresh=true(기본)로 목록 유지(깜빡임 X)',
+        '실전: 필터·탭·대상(id) 변경(watch) → 기본 false 로 스피너(옛 데이터는 새 조건과 안 맞음)',
+        '실전: 대시보드/피드처럼 마지막 데이터 유지 → skipError=true(에러는 토스트/배지로)',
       ],
       demo: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -149,6 +154,40 @@ class _AsyncValueDeepPageState extends ConsumerState<AsyncValueDeepPage> {
                     sub: '에러라도 이전 value 있으면 data() 로',
                     value: _skipError,
                     onChanged: (v) => setState(() => _skipError = v),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // 실전 가이드: 각 옵션을 실제 어떤 화면에서 왜 쓰는지
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('실전 가이드 — 왜 / 언제 쓰나',
+                      style: Theme.of(context).textTheme.labelMedium),
+                  const SizedBox(height: 6),
+                  Text(
+                    '• skipLoadingOnRefresh=true(기본): 당겨서 새로고침 · 재시도 버튼 · 주기적 갱신. '
+                    '보던 목록을 유지한 채 조용히 갱신해 전체 스피너로 깜빡이지 않게 한다 — 거의 항상 이대로.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '• skipLoadingOnReload=false(기본): 필터·탭·대상(id) 변경처럼 watch 의존이 바뀐 경우. '
+                    '옛 데이터는 새 조건과 안 맞으니 스피너를 보여 혼동을 막는다(예: 사용자 A→B 목록 전환). '
+                    '연속성이 더 중요하면 true 로.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '• skipError=true: 대시보드·피드처럼 "마지막 정상 데이터"를 계속 보여주고 싶을 때. '
+                    '갱신이 실패해도 화면을 비우지 않고, 에러는 토스트/배지로만 알린다. '
+                    '기본(false)은 에러 화면을 표시.',
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               ),
@@ -269,5 +308,20 @@ async.when(
   data: (d) => Text('$d'),
   loading: () => const CircularProgressIndicator(),
   error: (e, st) => Text('$e'),
+);
+
+// ── 실전 사용 ──
+// (1) 당겨서 새로고침/재시도: 기본값 그대로 → 보던 목록 유지(깜빡임 없음)
+RefreshIndicator(onRefresh: () => ref.refresh(p.future), child: list);
+
+// (2) 필터/탭/대상(id) 변경(watch 의존): 기본 false 그대로 →
+//     옛 데이터는 새 조건과 안 맞으니 스피너로 (잘못된 데이터 잠깐 보이는 것 방지)
+
+// (3) 대시보드/피드: 갱신 실패해도 마지막 정상 데이터를 유지하고 싶다
+async.when(
+  skipError: true,                  // 에러여도 이전 value 로 data() 호출
+  data: (d) => Dashboard(d),        // 화면은 그대로, 에러는 SnackBar 등으로 따로
+  loading: () => const Spinner(),
+  error: (e, _) => const Spinner(), // 사실상 거의 안 불림(이전 값이 있으면)
 );
 ''';
