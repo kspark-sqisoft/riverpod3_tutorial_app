@@ -235,3 +235,62 @@ final class WeatherFamily extends $Family
   @override
   String toString() => r'weatherProvider';
 }
+
+/// weatherWatched: city 를 "인자로 받지 않고" 내부에서 ref.watch 하는 버전.
+///
+/// 위 family(weather(city)) 와 비교하기 위한 예시:
+///  - family 버전: 도시 전환 = 위젯이 다른 인스턴스를 watch → 구도시 인스턴스가
+///    onRemoveListener → onCancel → onDispose 로 폐기되고 새 인스턴스가 build (인스턴스 "교체").
+///  - 이 버전: city 를 내부에서 watch 하므로 인스턴스는 "하나"뿐. 도시가 바뀌면
+///    같은 인스턴스가 invalidate 되어 onDispose(이전 build 정리) → build 재실행.
+///    구독자는 그대로라 onAddListener/onRemoveListener 는 도시 전환 때 찍히지 않는다.
+
+@ProviderFor(weatherWatched)
+final weatherWatchedProvider = WeatherWatchedProvider._();
+
+/// weatherWatched: city 를 "인자로 받지 않고" 내부에서 ref.watch 하는 버전.
+///
+/// 위 family(weather(city)) 와 비교하기 위한 예시:
+///  - family 버전: 도시 전환 = 위젯이 다른 인스턴스를 watch → 구도시 인스턴스가
+///    onRemoveListener → onCancel → onDispose 로 폐기되고 새 인스턴스가 build (인스턴스 "교체").
+///  - 이 버전: city 를 내부에서 watch 하므로 인스턴스는 "하나"뿐. 도시가 바뀌면
+///    같은 인스턴스가 invalidate 되어 onDispose(이전 build 정리) → build 재실행.
+///    구독자는 그대로라 onAddListener/onRemoveListener 는 도시 전환 때 찍히지 않는다.
+
+final class WeatherWatchedProvider
+    extends $FunctionalProvider<AsyncValue<Weather>, Weather, FutureOr<Weather>>
+    with $FutureModifier<Weather>, $FutureProvider<Weather> {
+  /// weatherWatched: city 를 "인자로 받지 않고" 내부에서 ref.watch 하는 버전.
+  ///
+  /// 위 family(weather(city)) 와 비교하기 위한 예시:
+  ///  - family 버전: 도시 전환 = 위젯이 다른 인스턴스를 watch → 구도시 인스턴스가
+  ///    onRemoveListener → onCancel → onDispose 로 폐기되고 새 인스턴스가 build (인스턴스 "교체").
+  ///  - 이 버전: city 를 내부에서 watch 하므로 인스턴스는 "하나"뿐. 도시가 바뀌면
+  ///    같은 인스턴스가 invalidate 되어 onDispose(이전 build 정리) → build 재실행.
+  ///    구독자는 그대로라 onAddListener/onRemoveListener 는 도시 전환 때 찍히지 않는다.
+  WeatherWatchedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'weatherWatchedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$weatherWatchedHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Weather> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Weather> create(Ref ref) {
+    return weatherWatched(ref);
+  }
+}
+
+String _$weatherWatchedHash() => r'd0f6f286701b985cda7f764e89c90765a3374be5';

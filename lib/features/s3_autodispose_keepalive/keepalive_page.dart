@@ -22,12 +22,17 @@ class _KeepAlivePageState extends ConsumerState<KeepAlivePage> {
     return ConceptPage(
       title: '9. autoDispose & keepAlive',
       explanation:
-          '코드생성 provider 는 기본이 autoDispose 입니다. 구독자가 모두 사라지면 폐기되고, '
-          '다시 구독하면 build 가 재실행됩니다. @Riverpod(keepAlive: true) 를 붙이면 '
-          '구독자가 없어도 상태가 유지됩니다. 아래 스위치로 구독 위젯을 껐다 켜보며 '
-          '두 provider 의 "생성 시각"이 어떻게 달라지는지(로그와 함께) 확인하세요.',
+          'provider 는 게으르게(lazy) 동작합니다. 아무도 안 보면 아예 만들어지지 않다가, '
+          '처음 watch 또는 listen 되는 순간 build() 가 실행되어 생성됩니다. '
+          '코드생성 provider 는 기본이 autoDispose 라서, 마지막 구독자까지 사라지면(구독 0) '
+          '폐기되고, 다음에 다시 구독하면 build 가 처음부터 재실행됩니다. '
+          '(ref.read 는 1회성 읽기라 구독을 만들지 않습니다 — read 만 해서는 살아남지 못합니다.) '
+          '@Riverpod(keepAlive: true) 를 붙이면 구독자가 0 이 되어도 폐기되지 않고 상태가 유지됩니다. '
+          '아래 스위치로 구독 위젯을 껐다 켜보며 두 provider 의 "생성 시각"이 어떻게 달라지는지(로그와 함께) 확인하세요.',
       points: const [
+        '생성 시점: 처음 watch/listen 되는 순간 build() 실행 (lazy — 아무도 안 보면 안 만들어짐)',
         'autoDispose(기본): 구독자 0 → 폐기, 재구독 시 새로 build',
+        'ref.read 는 구독을 만들지 않음 → read 만으로는 provider 를 살려둘 수 없다',
         '@Riverpod(keepAlive: true): 구독자 0 이어도 상태 유지',
         '스위치 OFF → autoDisposeStamp 만 dispose 로그가 찍힌다',
         '스위치 다시 ON → autoDispose 는 시각이 갱신, keepAlive 는 그대로',

@@ -94,3 +94,38 @@ Future<Weather> weather(Ref ref, String city) async {
   log.i('🌡️ [weather($city)] 로드 완료: ${w.display}');
   return w;
 }
+
+/// weatherWatched: city 를 "인자로 받지 않고" 내부에서 ref.watch 하는 버전.
+///
+/// 위 family(weather(city)) 와 비교하기 위한 예시:
+///  - family 버전: 도시 전환 = 위젯이 다른 인스턴스를 watch → 구도시 인스턴스가
+///    onRemoveListener → onCancel → onDispose 로 폐기되고 새 인스턴스가 build (인스턴스 "교체").
+///  - 이 버전: city 를 내부에서 watch 하므로 인스턴스는 "하나"뿐. 도시가 바뀌면
+///    같은 인스턴스가 invalidate 되어 onDispose(이전 build 정리) → build 재실행.
+///    구독자는 그대로라 onAddListener/onRemoveListener 는 도시 전환 때 찍히지 않는다.
+@riverpod
+Future<Weather> weatherWatched(Ref ref) async {
+  final city = ref.watch(selectedCityProvider); // 인자 대신 watch → 도시 바뀌면 재build
+  final unit = ref.watch(unitProvider); // 단위도 watch → 바뀌면 재build
+  log.t('🟣 [weatherWatched] build 시작 (city=$city, unit=$unit)');
+
+  // family 버전과 같은 콜백을 달아 두고 "무엇이 찍히는지"를 비교한다.
+  ref.onAddListener(() => log.t('➕ [weatherWatched] onAddListener'));
+  ref.onRemoveListener(() => log.t('➖ [weatherWatched] onRemoveListener'));
+  ref.onCancel(() => log.w('⏸️ [weatherWatched] onCancel (구독 0)'));
+  ref.onResume(() => log.d('▶️ [weatherWatched] onResume'));
+  ref.onDispose(() => log.i('⚪ [weatherWatched] onDispose (이전 build 정리 or 폐기)'));
+
+  await Future<void>.delayed(const Duration(milliseconds: 700));
+  final baseC = _baseTempC[city] ?? 20;
+  final temp =
+      unit == TempUnit.celsius ? baseC : (baseC * 9 / 5 + 32).round();
+  final w = Weather(
+    city: city,
+    temp: temp,
+    unit: unit,
+    condition: _condition[city] ?? '맑음',
+  );
+  log.i('🌡️ [weatherWatched] 로드 완료: ${w.display}');
+  return w;
+}

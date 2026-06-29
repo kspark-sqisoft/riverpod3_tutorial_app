@@ -8,29 +8,42 @@ part of 'lifecycle_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// 라이프사이클 콜백을 모두 등록한 데모 provider.
+/// 라이프사이클 콜백을 모두 등록한 데모 provider (Notifier).
 ///
 /// keepAlive: true 로 두어 "마지막 리스너 제거(onCancel/Paused)"와
 /// "재구독(onResume)"을 폐기 없이 또렷하게 관찰할 수 있게 한다.
-/// (onDispose 는 화면의 '무효화' 버튼으로 직접 유발한다.)
+///
+/// 세 가지 동작을 구분해서 보여준다:
+///  1) 구독 추가/제거 → onAddListener / onRemoveListener / onCancel / onResume
+///  2) 상태 변경(bump) → 아무 라이프사이클 콜백도 안 찍힌다. build 재실행·onDispose 없이
+///     리스너에게 "값이 바뀜" 알림만 간다. '생성 @시각'은 그대로, '변경 N회'만 증가.
+///  3) 무효화(invalidate) → onDispose 후 build 재실행. '생성 @시각' 갱신, '변경'은 0 으로 리셋.
 
-@ProviderFor(lifecycleDemo)
+@ProviderFor(LifecycleDemo)
 final lifecycleDemoProvider = LifecycleDemoProvider._();
 
-/// 라이프사이클 콜백을 모두 등록한 데모 provider.
+/// 라이프사이클 콜백을 모두 등록한 데모 provider (Notifier).
 ///
 /// keepAlive: true 로 두어 "마지막 리스너 제거(onCancel/Paused)"와
 /// "재구독(onResume)"을 폐기 없이 또렷하게 관찰할 수 있게 한다.
-/// (onDispose 는 화면의 '무효화' 버튼으로 직접 유발한다.)
-
+///
+/// 세 가지 동작을 구분해서 보여준다:
+///  1) 구독 추가/제거 → onAddListener / onRemoveListener / onCancel / onResume
+///  2) 상태 변경(bump) → 아무 라이프사이클 콜백도 안 찍힌다. build 재실행·onDispose 없이
+///     리스너에게 "값이 바뀜" 알림만 간다. '생성 @시각'은 그대로, '변경 N회'만 증가.
+///  3) 무효화(invalidate) → onDispose 후 build 재실행. '생성 @시각' 갱신, '변경'은 0 으로 리셋.
 final class LifecycleDemoProvider
-    extends $FunctionalProvider<String, String, String>
-    with $Provider<String> {
-  /// 라이프사이클 콜백을 모두 등록한 데모 provider.
+    extends $NotifierProvider<LifecycleDemo, String> {
+  /// 라이프사이클 콜백을 모두 등록한 데모 provider (Notifier).
   ///
   /// keepAlive: true 로 두어 "마지막 리스너 제거(onCancel/Paused)"와
   /// "재구독(onResume)"을 폐기 없이 또렷하게 관찰할 수 있게 한다.
-  /// (onDispose 는 화면의 '무효화' 버튼으로 직접 유발한다.)
+  ///
+  /// 세 가지 동작을 구분해서 보여준다:
+  ///  1) 구독 추가/제거 → onAddListener / onRemoveListener / onCancel / onResume
+  ///  2) 상태 변경(bump) → 아무 라이프사이클 콜백도 안 찍힌다. build 재실행·onDispose 없이
+  ///     리스너에게 "값이 바뀜" 알림만 간다. '생성 @시각'은 그대로, '변경 N회'만 증가.
+  ///  3) 무효화(invalidate) → onDispose 후 build 재실행. '생성 @시각' 갱신, '변경'은 0 으로 리셋.
   LifecycleDemoProvider._()
     : super(
         from: null,
@@ -47,13 +60,7 @@ final class LifecycleDemoProvider
 
   @$internal
   @override
-  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  String create(Ref ref) {
-    return lifecycleDemo(ref);
-  }
+  LifecycleDemo create() => LifecycleDemo();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(String value) {
@@ -64,4 +71,33 @@ final class LifecycleDemoProvider
   }
 }
 
-String _$lifecycleDemoHash() => r'16dc6a8efc56a74d65cd39033a8327d6e565a19a';
+String _$lifecycleDemoHash() => r'b78c95456d4db6fecb937d7389896b5d10844af8';
+
+/// 라이프사이클 콜백을 모두 등록한 데모 provider (Notifier).
+///
+/// keepAlive: true 로 두어 "마지막 리스너 제거(onCancel/Paused)"와
+/// "재구독(onResume)"을 폐기 없이 또렷하게 관찰할 수 있게 한다.
+///
+/// 세 가지 동작을 구분해서 보여준다:
+///  1) 구독 추가/제거 → onAddListener / onRemoveListener / onCancel / onResume
+///  2) 상태 변경(bump) → 아무 라이프사이클 콜백도 안 찍힌다. build 재실행·onDispose 없이
+///     리스너에게 "값이 바뀜" 알림만 간다. '생성 @시각'은 그대로, '변경 N회'만 증가.
+///  3) 무효화(invalidate) → onDispose 후 build 재실행. '생성 @시각' 갱신, '변경'은 0 으로 리셋.
+
+abstract class _$LifecycleDemo extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String, String>,
+              String,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
