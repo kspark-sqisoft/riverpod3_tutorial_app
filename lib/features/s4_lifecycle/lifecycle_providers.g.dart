@@ -62,7 +62,7 @@ final class LifecycleDemoProvider
   }
 }
 
-String _$lifecycleDemoHash() => r'd71787ac00383b4747427f16bc13f7ce62efdf28';
+String _$lifecycleDemoHash() => r'83ad898ff093de97412d4d169d092ac2c5de108e';
 
 /// 라이프사이클 콜백을 모두 등록한 데모 provider (keepAlive 버전).
 ///
@@ -138,7 +138,7 @@ final class LifecycleDemoAutoProvider
   }
 }
 
-String _$lifecycleDemoAutoHash() => r'6bad7461032918f52ee7ff445690e8e48b590fe7';
+String _$lifecycleDemoAutoHash() => r'5ada73fdd7842e896489567796f345039ced9de0';
 
 /// 위와 동일한 콜백을 가진 autoDispose(기본) 버전.
 ///

@@ -81,6 +81,8 @@ const List<TocSection> kToc = <TocSection>[
     TocTopic(number: 36, id: 'invalidate_refresh', title: 'invalidate vs refresh'),
     TocTopic(number: 37, id: 'mounted', title: 'ref.mounted (비동기 후 생존 확인)'),
     TocTopic(number: 38, id: 'keepalive_pages', title: 'keepAlive 체감 (여러 페이지)'),
+    TocTopic(number: 39, id: 'pull_to_refresh', title: '당겨서 새로고침 (RefreshIndicator)'),
+    TocTopic(number: 40, id: 'cancel', title: '요청 취소 (onDispose · 진행 중 끊기)'),
   ]),
 ];
 

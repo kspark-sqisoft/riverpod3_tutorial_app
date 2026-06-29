@@ -38,6 +38,7 @@ dependencies:
   riverpod_annotation: ^4.0.3
   go_router: ^17.3.0
   http: ^1.6.0
+  dio: ^5.9.0 # 토픽 40(요청 취소) — CancelToken 기반 취소 데모
   json_annotation: ^4.12.0
   logger: ^2.7.0
   riverpod_sqflite: ^0.4.3

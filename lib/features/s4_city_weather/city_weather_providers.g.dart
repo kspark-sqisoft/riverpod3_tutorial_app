@@ -198,7 +198,7 @@ final class WeatherProvider
   }
 }
 
-String _$weatherHash() => r'04273d1095c554cbc0731d3ca8d5ed99e8756081';
+String _$weatherHash() => r'ceb0559b64609ae08eed0b21689e537ee887a5ea';
 
 /// weather(city): 선택 도시의 날씨를 비동기 로드하는 family provider.
 ///
@@ -293,4 +293,4 @@ final class WeatherWatchedProvider
   }
 }
 
-String _$weatherWatchedHash() => r'd0f6f286701b985cda7f764e89c90765a3374be5';
+String _$weatherWatchedHash() => r'f463e8ad627f3d3f66bb02f0c94f545ca076bd2c';

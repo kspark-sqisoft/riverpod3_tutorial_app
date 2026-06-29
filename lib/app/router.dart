@@ -39,6 +39,8 @@ import '../features/s8_advanced/s8_invalidate_refresh/invalidate_refresh_page.da
 import '../features/s8_advanced/s8_keepalive_pages/keepalive_pages_page.dart';
 import '../features/s8_advanced/s8_mounted/mounted_page.dart';
 import '../features/s8_advanced/s8_pagination/pagination_page.dart';
+import '../features/s8_advanced/s8_cancel/cancel_page.dart';
+import '../features/s8_advanced/s8_pull_to_refresh/pull_to_refresh_page.dart';
 import '../home/landing_page.dart';
 import '../shared/placeholder_page.dart';
 import 'app_shell.dart';
@@ -89,6 +91,8 @@ final Map<String, WidgetBuilder> topicPages = <String, WidgetBuilder>{
   'invalidate_refresh': (context) => const InvalidateRefreshPage(), // 토픽 36
   'mounted': (context) => const MountedPage(), // 토픽 37
   'keepalive_pages': (context) => const KeepAlivePagesPage(), // 토픽 38
+  'pull_to_refresh': (context) => const PullToRefreshPage(), // 토픽 39
+  'cancel': (context) => const CancelPage(), // 토픽 40
 };
 
 /// 앱 라우터. ShellRoute 로 사이드바(AppShell)를 유지한 채 콘텐츠(child)만 교체한다.
