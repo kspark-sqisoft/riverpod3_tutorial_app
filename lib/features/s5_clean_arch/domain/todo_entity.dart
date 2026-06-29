@@ -8,4 +8,14 @@ class TodoEntity {
   final int id;
   final String title;
   final bool done;
+
+  // 일부 필드만 바꾼 새 엔티티(불변 업데이트). 도메인은 항상 새 객체로 교체한다.
+  TodoEntity copyWith({String? title, bool? done}) => TodoEntity(
+        id: id,
+        title: title ?? this.title,
+        done: done ?? this.done,
+      );
+
+  @override
+  String toString() => 'TodoEntity(id: $id, title: $title, done: $done)';
 }
