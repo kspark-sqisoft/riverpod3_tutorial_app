@@ -14,6 +14,10 @@ class TodoItem {
   // 일부 필드만 바꾼 새 객체를 만든다(불변 업데이트).
   TodoItem copyWith({bool? done}) =>
       TodoItem(id: id, title: title, done: done ?? this.done);
+
+  // 디버깅/로그용 문자열 표현.
+  @override
+  String toString() => 'TodoItem(id: $id, title: $title, done: $done)';
 }
 
 /// NotifierProvider(코드생성 클래스형): 동기 상태(할일 목록)를 관리한다.

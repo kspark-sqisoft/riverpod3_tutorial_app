@@ -9,8 +9,9 @@ part 'keepalive_pages_providers.g.dart';
 class VolatileCounter extends _$VolatileCounter {
   @override
   int build() {
-    log.t('🟢 volatileCounter build (생성/재생성)');
-    ref.onDispose(() => log.i('⚪ volatileCounter dispose — autoDispose (값 사라짐)'));
+    log.t('🟢 [volatileCounterProvider] build (생성/재생성)');
+    ref.onDispose(() =>
+        log.i('⚪ [volatileCounterProvider] dispose — autoDispose (값 사라짐)'));
     return 0;
   }
 
@@ -22,8 +23,9 @@ class VolatileCounter extends _$VolatileCounter {
 class PersistentCounter extends _$PersistentCounter {
   @override
   int build() {
-    log.t('🟢 persistentCounter build (최초 1회만)');
-    ref.onDispose(() => log.i('⚪ persistentCounter dispose (앱 종료 등, 거의 안 됨)'));
+    log.t('🟢 [persistentCounterProvider] build (최초 1회만)');
+    ref.onDispose(() =>
+        log.i('⚪ [persistentCounterProvider] dispose (앱 종료 등, 거의 안 됨)'));
     return 0;
   }
 

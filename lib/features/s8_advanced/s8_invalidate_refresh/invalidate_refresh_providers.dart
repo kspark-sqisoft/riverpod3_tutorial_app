@@ -11,6 +11,6 @@ int _builds = 0; // 이 provider 가 몇 번 build 됐는지(모듈 전역)
 @riverpod
 int rebuildCounter(Ref ref) {
   _builds++;
-  log.t('🟢 rebuildCounter build #$_builds');
+  log.t('🟢 [rebuildCounterProvider] build #$_builds');
   return _builds;
 }

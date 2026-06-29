@@ -31,26 +31,26 @@ Future<String> cacheForDemo(Ref ref) async {
 
   // 마지막 구독이 사라지면 5초 후 캐시 폐기 예약
   ref.onCancel(() {
-    log.w('⏸️ [cacheFor] 구독 0 → 5초 후 캐시 폐기 예약');
+    log.w('⏸️ [cacheForDemoProvider] 구독 0 → 5초 후 캐시 폐기 예약');
     timer = Timer(const Duration(seconds: 5), () {
-      log.i('⌛ [cacheFor] 5초 경과 → 캐시 폐기(link.close)');
+      log.i('⌛ [cacheForDemoProvider] 5초 경과 → 캐시 폐기(link.close)');
       link.close(); // 이제 autoDispose 처럼 폐기됨
     });
   });
 
   // 만료 전에 다시 구독되면 타이머 취소 → 캐시 유지
   ref.onResume(() {
-    log.d('▶️ [cacheFor] 만료 전 재구독 → 캐시 유지(타이머 취소)');
+    log.d('▶️ [cacheForDemoProvider] 만료 전 재구독 → 캐시 유지(타이머 취소)');
     timer?.cancel();
   });
 
   // 폐기 시 타이머 정리(누수 방지)
   ref.onDispose(() {
     timer?.cancel();
-    log.i('⚪ [cacheFor] dispose');
+    log.i('⚪ [cacheForDemoProvider] dispose');
   });
 
-  log.t('🟢 [cacheFor] build — 데이터 새로 생성');
+  log.t('🟢 [cacheForDemoProvider] build — 데이터 새로 생성');
   await Future<void>.delayed(const Duration(milliseconds: 500)); // 생성 비용 흉내
   return '생성 시각 ${_now()}';
 }
@@ -66,23 +66,23 @@ Future<Post> cachedPost(Ref ref, int id) async {
   Timer? timer;
 
   ref.onCancel(() {
-    log.w('⏸️ [cachedPost($id)] 상세 닫힘(구독 0) → 10초 후 캐시 폐기 예약');
+    log.w('⏸️ [cachedPostProvider($id)] 상세 닫힘(구독 0) → 10초 후 캐시 폐기 예약');
     timer = Timer(const Duration(seconds: 10), () {
-      log.i('⌛ [cachedPost($id)] 10초 경과 → 캐시 폐기');
+      log.i('⌛ [cachedPostProvider($id)] 10초 경과 → 캐시 폐기');
       link.close();
     });
   });
   ref.onResume(() {
-    log.d('▶️ [cachedPost($id)] 10초 안에 재진입 → 캐시 사용(타이머 취소, 재요청 없음)');
+    log.d('▶️ [cachedPostProvider($id)] 10초 안에 재진입 → 캐시 사용(타이머 취소, 재요청 없음)');
     timer?.cancel();
   });
   ref.onDispose(() {
     timer?.cancel();
-    log.i('⚪ [cachedPost($id)] dispose');
+    log.i('⚪ [cachedPostProvider($id)] dispose');
   });
 
   // 이 로그/네트워크 호출이 "다시 찍히면" = 캐시 미스(재요청), 안 찍히면 = 캐시 사용
-  log.t('🌐 [cachedPost($id)] build — 네트워크 요청(/posts/$id)');
+  log.t('🌐 [cachedPostProvider($id)] build — 네트워크 요청(/posts/$id)');
   final client = ref.read(dummyJsonClientProvider);
   return client.fetchPost(id);
 }

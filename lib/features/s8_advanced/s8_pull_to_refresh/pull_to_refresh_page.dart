@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart'; // PointerDeviceKind
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,6 +6,18 @@ import '../../../shared/code_snippet.dart';
 import '../../../shared/concept_page.dart';
 import '../../../shared/lifecycle_log_view.dart';
 import 'pull_to_refresh_providers.dart';
+
+// 데스크톱/웹의 기본 ScrollBehavior 는 마우스를 dragDevices 에서 제외해, 마우스로 목록을
+// 끌어 스크롤(→ 당겨서 새로고침)할 수 없다. mouse 를 추가해 마우스 드래그로도 동작하게 한다.
+final _dragWithMouse = const MaterialScrollBehavior().copyWith(
+  dragDevices: {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.unknown,
+  },
+);
 
 /// 토픽 39: 당겨서 새로고침 (RefreshIndicator + ref.refresh(provider.future)).
 class PullToRefreshPage extends ConsumerWidget {
@@ -53,9 +66,13 @@ class PullToRefreshPage extends ConsumerWidget {
       ),
       snippets: const [
         CodeSnippet(
-            title: 'pull_to_refresh_page.dart (RefreshIndicator)', code: _codePage),
+          title: 'pull_to_refresh_page.dart (RefreshIndicator)',
+          code: _codePage,
+        ),
         CodeSnippet(
-            title: 'pull_to_refresh_providers.dart', code: _codeProvider),
+          title: 'pull_to_refresh_providers.dart',
+          code: _codeProvider,
+        ),
       ],
     );
   }
@@ -76,8 +93,10 @@ class PullToRefreshPage extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.error_outline,
-                    color: Theme.of(context).colorScheme.error),
+                Icon(
+                  Icons.error_outline,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 const SizedBox(height: 8),
                 Text('에러: ${async.error}', textAlign: TextAlign.center),
                 const SizedBox(height: 12),
@@ -95,40 +114,47 @@ class PullToRefreshPage extends ConsumerWidget {
     }
 
     final (posts, fetchedAt) = snapshot;
-    return RefreshIndicator(
-      // onRefresh 가 반환하는 Future 가 끝날 때까지 스피너 유지 → ref.refresh(provider.future) 를 반환.
-      onRefresh: () => ref.refresh(refreshablePostsProvider.future),
-      child: ListView.builder(
-        // 내용이 짧아도 당길 수 있도록 항상 스크롤 가능하게.
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(8),
-        itemCount: posts.length + 1, // +1 = 머리말(받아온 시각)
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(8, 4, 8, 12),
-              child: Row(
-                children: [
-                  const Icon(Icons.swipe_down, size: 18),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      '아래로 당겨 새로고침 · 받아온 시각 @$fetchedAt',
-                      style: Theme.of(context).textTheme.bodySmall,
+    // 마우스 드래그로도 당겨서 새로고침되도록 ScrollConfiguration 으로 감싼다(위 _dragWithMouse).
+    return ScrollConfiguration(
+      behavior: _dragWithMouse,
+      child: RefreshIndicator(
+        // onRefresh 가 반환하는 Future 가 끝날 때까지 스피너 유지 → ref.refresh(provider.future) 를 반환.
+        onRefresh: () => ref.refresh(refreshablePostsProvider.future),
+        child: ListView.builder(
+          // 내용이 짧아도 당길 수 있도록 항상 스크롤 가능하게.
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(8),
+          itemCount: posts.length + 1, // +1 = 머리말(받아온 시각)
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(8, 4, 8, 12),
+                child: Row(
+                  children: [
+                    const Icon(Icons.swipe_down, size: 18),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        '아래로 당겨 새로고침 · 받아온 시각 @$fetchedAt',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              );
+            }
+            final post = posts[index - 1];
+            return ListTile(
+              dense: true,
+              leading: CircleAvatar(child: Text('${post.id}')),
+              title: Text(
+                post.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             );
-          }
-          final post = posts[index - 1];
-          return ListTile(
-            dense: true,
-            leading: CircleAvatar(child: Text('${post.id}')),
-            title: Text(post.title,
-                maxLines: 1, overflow: TextOverflow.ellipsis),
-          );
-        },
+          },
+        ),
       ),
     );
   }

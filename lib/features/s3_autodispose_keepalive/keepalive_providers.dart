@@ -15,8 +15,8 @@ String _stamp() {
 /// 다시 구독하면 build 가 재실행되어 새 값(새 시각)이 만들어진다.
 @riverpod
 String autoDisposeStamp(Ref ref) {
-  log.t('🟢 autoDisposeStamp build');
-  ref.onDispose(() => log.i('⚪ autoDisposeStamp dispose'));
+  log.t('🟢 [autoDisposeStampProvider] build');
+  ref.onDispose(() => log.i('⚪ [autoDisposeStampProvider] dispose'));
   return _stamp();
 }
 
@@ -24,7 +24,7 @@ String autoDisposeStamp(Ref ref) {
 /// 다시 구독해도 처음 만든 값(시각)이 그대로 유지된다.
 @Riverpod(keepAlive: true)
 String keepAliveStamp(Ref ref) {
-  log.t('🟢 keepAliveStamp build');
-  ref.onDispose(() => log.i('⚪ keepAliveStamp dispose'));
+  log.t('🟢 [keepAliveStampProvider] build');
+  ref.onDispose(() => log.i('⚪ [keepAliveStampProvider] dispose'));
   return _stamp();
 }
